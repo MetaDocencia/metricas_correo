@@ -1,0 +1,38 @@
+/*-- scss:defaults --*/
+
+// colors
+
+$navbar-bg: #ffffff;
+$navbar-fg: #545454;
+
+$link-color: #C83737;
+$hover-color: lighten($link-color, 40%);
+
+
+
+/*-- scss:rules --*/
+.card-header {
+  background-color: #EFEFEF;
+}
+
+.nav-item > a:hover {
+  color: #C83737;
+}
+
+.nav-link {
+  color: #545454;
+}
+
+.tabset .nav-link {
+  color: #52515e;
+}
+
+.value-box {
+  text-align: center;
+ 
+}
+
+.quarto-dashboard .bslib-value-box .value-box-value {
+  font-size: clamp(.1em, 10cqw, 3em) !important;
+}
+
