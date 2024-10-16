@@ -6,8 +6,6 @@ website:
   sidebar:
     contents:
       - href: index.qmd
-        text: Home
-      - href: about.qmd
         text: Sobre MetaDocencia
       - href: dashboard.qmd
         text: Tablero
