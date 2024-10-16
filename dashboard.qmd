@@ -10,10 +10,13 @@ logo: images/md-logo.png
 ```{r}
 #| label: load-packages
 #| message: false
-library(tidyverse)
-library(gt)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
 library(scales)
 library(googlesheets4)
+library(forcats)
 ```
 
 ```{r}
