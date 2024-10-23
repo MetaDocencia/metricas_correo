@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GITHUB_PAT: ${{ secrets.TOKEN_USUARIO_JESI }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.AUTENTICACION_NO_INTERACTIVA }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
