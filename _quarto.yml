@@ -3,10 +3,9 @@ project:
 
 website:
   title: "Métricas de Mailchimp"
-  sidebar:
-    contents:
-      - href: dashboard.qmd
-        text: Tablero
+  contents:
+    - href: dashboard.qmd
+      text: Tablero
 
 format:
   html:
