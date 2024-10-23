@@ -23,7 +23,6 @@ library(forcats)
 #| label: cargar-datos
 #| message: false
 
-drive_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 
 gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 
