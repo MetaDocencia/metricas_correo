@@ -2,10 +2,13 @@ project:
   type: website
 
 website:
-  title: "Métricas de Mailchimp"
-  contents:
-    - href: dashboard.qmd
-      text: Tablero
+  title: "Métricas de MetaDocencia"
+  sidebar:  
+    contents:
+      - href: tablero-correo.qmd
+        text: Mailchimp
+      - href: tablero-zenodo.qmd
+        text: Zenodo
 
 format:
   html:

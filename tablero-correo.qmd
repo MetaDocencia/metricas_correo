@@ -341,7 +341,7 @@ alta |>
 ```
 ## Fila 3 {height="40%"}
 
-### Columna - Tasa de apertura por envío {width="50%"}
+### Columna - Tasa de apertura por envío{width="50%"}
 
 ```{r}
 #| title: Tasa de apertura por Newsletter
