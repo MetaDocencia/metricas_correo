@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write
     env:
-      GITHUB_PAT: ${{ secrets.TOKEN_USUARIO_JESI }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.AUTENTICACION_NO_INTERACTIVA }}
     steps:
       - name: Check out repository
