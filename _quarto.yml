@@ -5,8 +5,6 @@ website:
   title: "Métricas de Mailchimp"
   sidebar:
     contents:
-      - href: index.qmd
-        text: Sobre MetaDocencia
       - href: dashboard.qmd
         text: Tablero
 

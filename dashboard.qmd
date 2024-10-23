@@ -216,7 +216,7 @@ apuntes |>
 ```
 
 
-# 🚀 Mail semanal ALTa CA
+# 🚀 ALTa Ciencia Abierta
 
 ```{r}
 #| label: prep-alta-datos
@@ -301,7 +301,7 @@ list(
 
 ## Fila 2 {height="40%"}
 
-### Columna - Métricas por newsletter{width="60%"}
+### Columna - Métricas por envío{width="60%"}
 
 ```{r}
 #| title: Métricas por Newsletter
@@ -341,7 +341,7 @@ alta |>
 ```
 ## Fila 3 {height="40%"}
 
-### Columna - Tasa de apertura por newsletter {width="50%"}
+### Columna - Tasa de apertura por envío {width="50%"}
 
 ```{r}
 #| title: Tasa de apertura por Newsletter
@@ -356,7 +356,7 @@ alta |>
   labs(x = "Newsletter", y = "Cantidad")
 ```
 
-### Columna - Desuscriptores por newsletters {width="50%"}
+### Columna - Desuscriptores por envío {width="50%"}
 
 ```{r}
 #| title: Desuscriptores por Newsletter
