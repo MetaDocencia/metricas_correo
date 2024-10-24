@@ -5,8 +5,6 @@ website:
   title: "Tableros"
   sidebar:  
     contents:
-      - href: index.qmd
-        text: Home
       - href: tablero-correo.qmd
         text: Mailchimp
       - href: tablero-zenodo.qmd
