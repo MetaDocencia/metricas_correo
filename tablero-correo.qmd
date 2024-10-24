@@ -3,6 +3,9 @@ title: "Métricas de Mailchimp"
 format: 
   dashboard:
     orientation: rows
+    nav-buttons: 
+      - icon: images/md-logo.png
+        href: https://metadocencia.github.io/reporte-mailchimp/
 embed-resources: true
 logo: images/md-logo.png
 ---
