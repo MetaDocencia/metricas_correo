@@ -1,374 +1,243 @@
 ---
-title: "Métricas de Mailchimp"
+title: "Dashboard de Publicaciones en Zenodo"
 format: 
   dashboard:
     orientation: rows
+    theme:
+      - flatly
+      - custom.scss
+    nav: sticky
 embed-resources: true
-logo: images/md-logo.png
+
 ---
 
 ```{r}
-#| label: load-packages
+#| label: setup
 #| message: false
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
+#| warning: false
+
+library(tidyverse)
+library(gt)
 library(scales)
+library(lubridate)
+library(bslib)
+library(plotly)
 library(googlesheets4)
-library(forcats)
-```
-
-```{r}
-#| label: cargar-datos
-#| message: false
-
+library(bsicons)
 
 gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
-
-mailchimp <- read_sheet("1grpIQWXQfVT82vS-mU2JjkKzZ0zwrGes3CFEnWdjYf8")[c(1,4:7, 13:19)]
-
-
-```
-
-```{r}
-#| label: prep-datos
-
-names(mailchimp) <- c("titulo", "envio_fecha", "envio_dia", "total_destinatarios", "entregas_exitosas", "aperturas_unicas", "aperturas_tasa", "aperturas_totales", "clics_unicos", "clics_tasa", "clics_totales", "desuscriptores")
-
-mailchimp <- mailchimp |>
-  mutate(envio_fecha = format(envio_fecha, "%Y-%m"),
-         envio_dia = fct_recode(envio_dia, 
-                                "Lunes" = "Monday",
-                                "Martes" = "Tuesday",
-                                "Miércoles" = "Wednesday",
-                                "Jueves" = "Thursday",
-                                "Viernes" = "Friday",
-                                "Sábado" = "Saturday",
-                                "Domingo" = "Sunday"),
-         envio_dia = fct_relevel(envio_dia, "Lunes", "Martes", "Miércoles", "Jueves", "Viernes"))
-
-
-
-```
-
-# 📰 Newsletter
-
-```{r}
-#| label: prep-apuntes-datos
-
-apuntes <- mailchimp |>
-  filter(str_detect(titulo, pattern = "Apuntes [0-9]+")) |>
-  mutate(titulo = as.numeric(str_extract(titulo, "[0-9]+")))
-
-
-```
-
-## Fila 1 - Totales de ultimo envio {height="20%"}
-
-```{r}
-#| label: calcular-totales-apuntes
-
-ultimo_envio <- apuntes |>
-  arrange(desc(envio_fecha)) |>
-  slice_head(n = 1)
-
+# Cargar datos
+zenododata <- read_sheet("https://docs.google.com/spreadsheets/d/1vJ5BffSEJia0HS36zUJU90ivmekopyBVEsKTndtJOQI/edit?gid=1537900891#gid=1537900891")
 ```
 
 
 ```{r}
-#| content: valuebox
-#| title: "Destinatarios totales"
+#| label: metricas-totales
+# Calcular métricas
+total_vistas <- sum(zenododata$vistas, na.rm = TRUE)
+total_descargas <- sum(zenododata$descargas, na.rm = TRUE)
+promedio_vistas <- mean(zenododata$vistas_dias, na.rm = TRUE)
+promedio_descargas <- mean(zenododata$descargas_dias, na.rm = TRUE)
+```
 
+## Métricas Generales {height=""}
 
-list(
-  icon = "people-fill",
-  color = "#43AC6A",
-  value = ultimo_envio$total_destinatarios
+```{r}
+# Crear value boxes
+value_box(
+  title = "Total de Vistas",
+  value = scales::number(total_vistas, big.mark = ","),
+  showcase = bsicons::bs_icon("eye"),
+  theme = "primary",
+  full_width = TRUE,
 )
 ```
 
 
 ```{r}
-#| content: valuebox
-#| title: "Desuscripciones"
-
-list(
-  icon = "person-fill-dash",
-  color = "#C83737",
-  value = ultimo_envio$desuscriptores
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Aperturas únicas"
-
-list(
-  icon = "envelope-paper",
-  color = "#EEEEEE",
-  value = ultimo_envio$aperturas_unicas
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Tasa de apertura"
-
-list(
-  icon = "envelope-paper-fill",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$aperturas_tasa)
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Tasa de clicks"
-
-list(
-  icon = "cursor",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$clics_tasa)
+value_box(
+  title = "Total de Descargas",
+  value = scales::number(total_descargas, big.mark = ","),
+  showcase = bsicons::bs_icon("download"),
+  theme = "info",
+  full_width = TRUE,
 )
 ```
 
 
-## Fila 2 {height="40%"}
+```{r}
+value_box(
+  title = "Promedio Diario de Vistas",
+  value = scales::number(promedio_vistas, accuracy = 0.01),
+  showcase = bsicons::bs_icon("graph-up"),
+  theme = "success",
+  full_width = TRUE
+)
+```
 
-### Columna - Métricas por newsletter{width="60%"}
 
 ```{r}
-#| title: Métricas por Newsletter
-#| fig-width: 8
-#| fig-height: 2
+value_box(
+  title = "Promedio Diario de Descargas",
+  value = scales::number(promedio_descargas, accuracy = 0.01),
+  showcase = bsicons::bs_icon("graph-up-arrow"),
+  theme = "warning",
+  full_width = TRUE
+)
+```
 
-apuntes |>
-  pivot_longer(cols = c(total_destinatarios, entregas_exitosas, aperturas_unicas),
-               names_to = "variables",
-               values_to = "valores") |>
-  ggplot(aes(x = titulo, y = valores, color = variables, group = variables)) +
-  geom_line(linewidth = 1) +
-  scale_color_manual(
-    values = c("total_destinatarios" = "#C83737", "entregas_exitosas" = "#004F70", "aperturas_unicas" = "#F67A21"), 
-    labels = c("total_destinatarios" = "Destinatarios totales", "entregas_exitosas" = "Entregas exitosas",
-               "aperturas_unicas" = "Aperturas únicas")  
+
+##  {height=""}
+
+### Vistas y descargas {width="50%"}
+```{r}
+#| label: grafico-tipo
+#| fig-width: 12
+#| fig-height: 6
+
+# Gráfico 1: Vistas y Descargas por Tipo
+p1 <- zenododata %>%
+  pivot_longer(cols = c(vistas, descargas),
+               names_to = "metrica",
+               values_to = "valor") %>%
+  ggplot(aes(x = tipo, y = valor, fill = metrica)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("vistas" = "#004F70", 
+                              "descargas" = "#C83737"),
+                    labels = c("Vistas", "Descargas")) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "top"
   ) +
-  scale_x_continuous(breaks = seq(from = min(apuntes$titulo, na.rm = TRUE), 
-                                    to = max(apuntes$titulo, na.rm = TRUE), 
-                                    by = 1)) +
+  labs(
+    title = "Vistas y Descargas por Tipo de Publicación",
+    x = "Tipo de Publicación",
+    y = "Cantidad",
+    fill = "Métrica"
+  )
+
+ggplotly(p1)
+
+```
+
+
+### Historico {width="50%"}
+
+```{r}
+#| label: grafico-historico
+#| fig-width: 12
+#| fig-height: 6
+
+# Gráfico 2: Progresión Histórica
+p2 <- zenododata %>%
+  mutate(fecha_publicacion = as.Date(fecha_publicacion)) %>%
+  arrange(fecha_publicacion) %>%
+  ggplot() +
+  geom_line(aes(x = fecha_publicacion, y = vistas, 
+                color = "Vistas"), size = 1) +
+  geom_line(aes(x = fecha_publicacion, y = descargas, 
+                color = "Descargas"), size = 1) +
+  scale_color_manual(values = c("Vistas" = "#004F70", 
+                               "Descargas" = "#C83737")) +
   theme_minimal() +
-  labs(x = "Newsletter", y = "Cantidad", color = "") 
-```
-
-### Columna - Tasa de apertura por día {width="40%"}
-
-```{r}
-#| title: Tasa de apertura promedio por día de la semana
-#| fig-width: 4
-#| fig-height: 2
-
-apuntes |>
-  group_by(envio_dia) %>% 
-  summarise(media = mean(aperturas_tasa, na.rm = TRUE)) %>% 
-  ggplot(aes(x = envio_dia, y = media, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
-  labs(x = "", y = "Tasa de apertura %")
-```
-## Fila 3 {height="40%"}
-
-### Columna - Tasa de apertura por newsletter {width="50%"}
-
-```{r}
-#| title: Tasa de apertura por Newsletter
-#| fig-width: 6
-#| fig-height: 2
-
-apuntes |>
-  ggplot(aes(x = titulo, y = aperturas_tasa, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_x_continuous(breaks = seq(from = min(apuntes$titulo, na.rm = TRUE), 
-                                    to = max(apuntes$titulo, na.rm = TRUE), 
-                                    by = 1)) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
-  labs(x = "Newsletter", y = "Cantidad")
-```
-
-### Columna - Desuscriptores por newsletters {width="50%"}
-
-```{r}
-#| title: Desuscriptores por Newsletter
-#| fig-width: 6
-#| fig-height: 2
-
-apuntes |>
-  ggplot(aes(x = titulo, y = desuscriptores, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_x_continuous(breaks = seq(from = min(apuntes$titulo, na.rm = TRUE), 
-                                    to = max(apuntes$titulo, na.rm = TRUE), 
-                                    by = 1)) +
-  scale_y_continuous(breaks = seq(from = 0, to = 15, by = 2), limits = c(0, 15)) +
-  labs(x = "Newsletter", y = "Cantidad")
-```
-
-
-# 🚀 ALTa Ciencia Abierta
-
-```{r}
-#| label: prep-alta-datos
-
-regex <- "Mensaje semana(l)? (\\d+|[A-Za-z]\\d+) ALTa[123]2024"
-
-alta <- mailchimp |>
-  filter(str_detect(titulo, pattern = regex)) |>
-  mutate(titulo = paste0("C", str_match(titulo, "\\d+.*?(\\d)")[,2], "-E", str_match(titulo, "[A-Za-z]?(\\d+)")[,2]))
-
-
-```
-
-## Fila 1 - Totales de ultimo envio {height="20%"}
-
-```{r}
-#| label: calcular-totales-alta
-
-ultimo_envio <- alta |>
-  arrange(desc(envio_fecha)) |>
-  slice_head(n = 1)
-
-```
-
-
-```{r}
-#| content: valuebox
-#| title: "Destinatarios totales"
-
-list(
-  icon = "people-fill",
-  color = "#43AC6A",
-  value = ultimo_envio$total_destinatarios
-)
-```
-
-
-```{r}
-#| content: valuebox
-#| title: "Desuscripciones"
-
-list(
-  icon = "person-fill-dash",
-  color = "#C83737",
-  value = ultimo_envio$desuscriptores
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Aperturas únicas"
-
-list(
-  icon = "envelope-paper",
-  color = "#EEEEEE",
-  value = ultimo_envio$aperturas_unicas
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Tasa de apertura"
-
-list(
-  icon = "envelope-paper-fill",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$aperturas_tasa)
-)
-```
-
-```{r}
-#| content: valuebox
-#| title: "Tasa de clicks"
-
-list(
-  icon = "cursor",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$clics_tasa)
-)
-```
-
-
-## Fila 2 {height="40%"}
-
-### Columna - Métricas por envío{width="60%"}
-
-```{r}
-#| title: Métricas por Newsletter
-#| fig-width: 8
-#| fig-height: 2
-
-alta |>
-  pivot_longer(cols = c(total_destinatarios, entregas_exitosas, aperturas_unicas),
-               names_to = "variables",
-               values_to = "valores") |>
-  ggplot(aes(x = titulo, y = valores, color = variables, group = variables)) +
-  geom_line(linewidth = 1) +
-  scale_color_manual(
-    values = c("total_destinatarios" = "#C83737", "entregas_exitosas" = "#004F70", "aperturas_unicas" = "#F67A21"), 
-    labels = c("total_destinatarios" = "Destinatarios totales", "entregas_exitosas" = "Entregas exitosas",
-               "aperturas_unicas" = "Aperturas únicas")  
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "top",
+    axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
-  theme_minimal() +
-  labs(x = "Newsletter", y = "Cantidad", color = "") 
+  labs(
+    title = "Progresión Histórica de Vistas y Descargas",
+    x = "Fecha de Publicación",
+    y = "Cantidad",
+    color = "Métrica"
+  )
+
+ggplotly(p2)
 ```
 
-### Columna - Tasa de apertura por día {width="40%"}
+
+## Fila 3 - Gráficas Adicionales {height=""}
+
+### Promedios {width=""}
+```{r}
+#| label: grafico-promedios
+#| fig-width: 12
+#| fig-height: 6
+
+# Gráfico 3: Promedio de Vistas y Descargas por Publicación
+p3 <- zenododata %>%
+  select(titulo, vistas_dias, descargas_dias) %>%
+  pivot_longer(cols = c(vistas_dias, descargas_dias),
+               names_to = "metrica",
+               values_to = "valor") %>%
+  arrange(desc(valor)) %>%
+  head(15) %>% # Top 15 para mejor visualización
+  mutate(titulo = substr(titulo, 1, 50)) %>% # Acortar títulos largos
+  ggplot(aes(x = reorder(titulo, valor), y = valor, fill = metrica)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_fill_manual(values = c("vistas_dias" = "#004F70", 
+                              "descargas_dias" = "#C83737"),
+                    labels = c("Vistas por día", "Descargas por día")) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "top",
+    axis.text.y = element_text(size = 8)
+  ) +
+  labs(
+    title = "Promedio de Vistas y Descargas por Publicación",
+    x = "Título de la Publicación",
+    y = "Promedio Diario",
+    fill = "Métrica"
+  )
+
+ggplotly(p3)
+```
+
+
+## Fila 4 - Gráficas Adicionales {height=""}
 
 ```{r}
-#| title: Tasa de apertura promedio por día de la semana
-#| fig-width: 4
-#| fig-height: 2
+#| label: tabla-top
 
-alta |>
-  group_by(envio_dia) %>% 
-  summarise(media = mean(aperturas_tasa, na.rm = TRUE)) %>% 
-  ggplot(aes(x = envio_dia, y = media, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
-  labs(x = "", y = "Tasa de apertura %")
+zenododata %>%
+  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  arrange(desc(vistas_dias)) %>%
+  head(10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top 10 Publicaciones por Vistas"
+  ) %>%
+  fmt_number(
+    columns = c(vistas, descargas),
+    decimals = 0,
+    use_seps = TRUE
+  ) %>%
+  fmt_number(
+    columns = c(vistas_dias, descargas_dias),
+    decimals = 2
+  ) %>%
+  cols_label(
+    titulo = "Título",
+    tipo = "Tipo",
+    vistas = "Vistas",
+    descargas = "Descargas",
+    vistas_dias = "Vistas/Día",
+    descargas_dias = "Descargas/Día"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all",
+        color = "grey",
+        weight = px(1)
+      )
+    ),
+    locations = cells_body()
+  ) %>%
+  opt_row_striping()
+
 ```
-## Fila 3 {height="40%"}
-
-### Columna - Tasa de apertura por envío{width="50%"}
-
-```{r}
-#| title: Tasa de apertura por Newsletter
-#| fig-width: 6
-#| fig-height: 2
-
-alta |>
-  ggplot(aes(x = titulo, y = aperturas_tasa, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
-  labs(x = "Newsletter", y = "Cantidad")
-```
-
-### Columna - Desuscriptores por envío {width="50%"}
-
-```{r}
-#| title: Desuscriptores por Newsletter
-#| fig-width: 6
-#| fig-height: 2
-
-alta |>
-  ggplot(aes(x = titulo, y = desuscriptores, group = 1)) +
-  geom_line(linewidth = 1, color = "#C83737") +
-  theme_minimal() +
-  scale_y_continuous(breaks = seq(from = 0, to = 15, by = 2), limits = c(0, 15)) +
-  labs(x = "Newsletter", y = "Cantidad")
-```
-
-
