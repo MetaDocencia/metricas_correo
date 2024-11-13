@@ -26,7 +26,7 @@ library(googlesheets4)
 library(bsicons)
 
 
-##gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 # Cargar datos
 zenododata <- read_sheet("https://docs.google.com/spreadsheets/d/1vJ5BffSEJia0HS36zUJU90ivmekopyBVEsKTndtJOQI/edit?gid=1537900891#gid=1537900891")
 ```
