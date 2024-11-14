@@ -8,7 +8,7 @@ format:
       - custom.scss
     nav: sticky
 embed-resources: true
-
+logo: images/md-logo.png
 ---
 
 ```{r}
