@@ -119,7 +119,8 @@ p1 <- zenododata %>%
     fill = "Métrica"
   )
 
-ggplotly(p1)
+ggplotly(p1) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 
 ```
 
@@ -155,7 +156,9 @@ p2 <- zenododata %>%
     color = "Métrica"
   )
 
-ggplotly(p2)
+ggplotly(p2) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
+
 ```
 
 
@@ -195,7 +198,9 @@ p3 <- zenododata %>%
     fill = "Métrica"
   )
 
-ggplotly(p3)
+ggplotly(p3) %>%
+    config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
+
 ```
 
 
