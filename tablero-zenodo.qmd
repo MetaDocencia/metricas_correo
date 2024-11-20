@@ -1,5 +1,6 @@
 ---
-title: "Dashboard de Publicaciones en Zenodo"
+title: |
+  "Dashboard de Publicaciones en Zenodo" <a href="https://metadocencia.github.io/reporte-mailchimp/" class="btn btn-primary btn-sm" style="margin-left: 10px;"><i class="bi bi-link-45deg"></i> Volver al principio</a>
 format: 
   dashboard:
     orientation: rows
@@ -9,6 +10,9 @@ format:
     nav: sticky
 embed-resources: true
 logo: images/md-logo.png
+include-in-header:
+  - text: |
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 ---
 
 ```{r}
@@ -24,7 +28,6 @@ library(bslib)
 library(plotly)
 library(googlesheets4)
 library(bsicons)
-
 
 gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 # Cargar datos

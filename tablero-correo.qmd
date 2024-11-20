@@ -1,5 +1,6 @@
 ---
-title: "Métricas de Mailchimp"
+title: |
+  "Dashboard de Publicaciones en Zenodo" <a href="https://metadocencia.github.io/reporte-mailchimp/" class="btn btn-primary btn-sm" style="margin-left: 10px;"><i class="bi bi-link-45deg"></i> Volver al principio</a>
 format: 
   dashboard:
     orientation: rows
@@ -8,6 +9,9 @@ format:
         href: https://metadocencia.github.io/reporte-mailchimp/
 embed-resources: true
 logo: images/md-logo.png
+include-in-header:
+  - text: |
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 ---
 
 ```{r}
@@ -20,6 +24,10 @@ library(stringr)
 library(scales)
 library(googlesheets4)
 library(forcats)
+library(bsicons)
+library(bslib)
+library(plotly)
+
 ```
 
 ```{r}
@@ -30,7 +38,6 @@ library(forcats)
 gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 
 mailchimp <- read_sheet("1grpIQWXQfVT82vS-mU2JjkKzZ0zwrGes3CFEnWdjYf8")[c(1,4:7, 13:19)]
-
 
 ```
 
@@ -67,7 +74,7 @@ apuntes <- mailchimp |>
 
 ```
 
-## Fila 1 - Totales de ultimo envio {height="20%"}
+## Fila 1 - Totales de ultimo envio {height=""}
 
 ```{r}
 #| label: calcular-totales-apuntes
@@ -146,7 +153,7 @@ list(
 #| fig-width: 8
 #| fig-height: 2
 
-apuntes |>
+p1 <- apuntes |>
   pivot_longer(cols = c(total_destinatarios, entregas_exitosas, aperturas_unicas),
                names_to = "variables",
                values_to = "valores") |>
@@ -162,6 +169,11 @@ apuntes |>
                                     by = 1)) +
   theme_minimal() +
   labs(x = "Newsletter", y = "Cantidad", color = "") 
+
+
+ggplotly(p1) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
+
 ```
 
 ### Columna - Tasa de apertura por día {width="40%"}
@@ -171,7 +183,7 @@ apuntes |>
 #| fig-width: 4
 #| fig-height: 2
 
-apuntes |>
+p2 <- apuntes |>
   group_by(envio_dia) %>% 
   summarise(media = mean(aperturas_tasa, na.rm = TRUE)) %>% 
   ggplot(aes(x = envio_dia, y = media, group = 1)) +
@@ -179,6 +191,9 @@ apuntes |>
   theme_minimal() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
   labs(x = "", y = "Tasa de apertura %")
+
+ggplotly(p2) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 ## Fila 3 {height="40%"}
 
@@ -189,7 +204,7 @@ apuntes |>
 #| fig-width: 6
 #| fig-height: 2
 
-apuntes |>
+p3 <- apuntes |>
   ggplot(aes(x = titulo, y = aperturas_tasa, group = 1)) +
   geom_line(linewidth = 1, color = "#C83737") +
   theme_minimal() +
@@ -198,6 +213,9 @@ apuntes |>
                                     by = 1)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
   labs(x = "Newsletter", y = "Cantidad")
+
+ggplotly(p3) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 
 ### Columna - Desuscriptores por newsletters {width="50%"}
@@ -207,7 +225,7 @@ apuntes |>
 #| fig-width: 6
 #| fig-height: 2
 
-apuntes |>
+p4 <- apuntes |>
   ggplot(aes(x = titulo, y = desuscriptores, group = 1)) +
   geom_line(linewidth = 1, color = "#C83737") +
   theme_minimal() +
@@ -216,6 +234,9 @@ apuntes |>
                                     by = 1)) +
   scale_y_continuous(breaks = seq(from = 0, to = 15, by = 2), limits = c(0, 15)) +
   labs(x = "Newsletter", y = "Cantidad")
+
+ggplotly(p4) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 
 
@@ -233,7 +254,7 @@ alta <- mailchimp |>
 
 ```
 
-## Fila 1 - Totales de ultimo envio {height="20%"}
+## Fila 1 - Totales de ultimo envio {height=""}
 
 ```{r}
 #| label: calcular-totales-alta
@@ -311,8 +332,8 @@ list(
 #| fig-width: 8
 #| fig-height: 2
 
-alta |>
-  pivot_longer(cols = c(total_destinatarios, entregas_exitosas, aperturas_unicas),
+p5 <- alta |>
+ pivot_longer(cols = c(total_destinatarios, entregas_exitosas, aperturas_unicas),
                names_to = "variables",
                values_to = "valores") |>
   ggplot(aes(x = titulo, y = valores, color = variables, group = variables)) +
@@ -323,7 +344,11 @@ alta |>
                "aperturas_unicas" = "Aperturas únicas")  
   ) +
   theme_minimal() +
-  labs(x = "Newsletter", y = "Cantidad", color = "") 
+  labs(x = "Newsletter", y = "Cantidad", color = "")
+
+ggplotly(p5) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
+
 ```
 
 ### Columna - Tasa de apertura por día {width="40%"}
@@ -333,7 +358,7 @@ alta |>
 #| fig-width: 4
 #| fig-height: 2
 
-alta |>
+p6 <- alta |>
   group_by(envio_dia) %>% 
   summarise(media = mean(aperturas_tasa, na.rm = TRUE)) %>% 
   ggplot(aes(x = envio_dia, y = media, group = 1)) +
@@ -341,6 +366,8 @@ alta |>
   theme_minimal() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
   labs(x = "", y = "Tasa de apertura %")
+ggplotly(p6) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 ## Fila 3 {height="40%"}
 
@@ -351,12 +378,14 @@ alta |>
 #| fig-width: 6
 #| fig-height: 2
 
-alta |>
+p7 <- alta |>
   ggplot(aes(x = titulo, y = aperturas_tasa, group = 1)) +
   geom_line(linewidth = 1, color = "#C83737") +
   theme_minimal() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +  
   labs(x = "Newsletter", y = "Cantidad")
+ggplotly(p7) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 
 ### Columna - Desuscriptores por envío {width="50%"}
@@ -366,12 +395,14 @@ alta |>
 #| fig-width: 6
 #| fig-height: 2
 
-alta |>
+p8 <- alta |>
   ggplot(aes(x = titulo, y = desuscriptores, group = 1)) +
   geom_line(linewidth = 1, color = "#C83737") +
   theme_minimal() +
   scale_y_continuous(breaks = seq(from = 0, to = 15, by = 2), limits = c(0, 15)) +
   labs(x = "Newsletter", y = "Cantidad")
+ggplotly(p8) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
 
 
