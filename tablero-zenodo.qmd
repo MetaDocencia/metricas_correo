@@ -1,6 +1,6 @@
 ---
 title: |
-  "Dashboard de Publicaciones en Zenodo" <a href="https://metadocencia.github.io/reporte-mailchimp/" class="btn btn-primary btn-sm" style="margin-left: 10px;"><i class="bi bi-link-45deg"></i> Volver al principio</a>
+  Dashboard de Publicaciones en Zenodo <a href="https://metadocencia.github.io/reporte-mailchimp/" class="btn btn-primary btn-sm" style="margin-left: 10px;"><i class="bi bi-link-45deg"></i> Volver al principio</a>
 format: 
   dashboard:
     orientation: rows
@@ -28,7 +28,9 @@ library(bslib)
 library(plotly)
 library(googlesheets4)
 library(bsicons)
+```
 
+```{r}
 gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 # Cargar datos
 zenododata <- read_sheet("https://docs.google.com/spreadsheets/d/1vJ5BffSEJia0HS36zUJU90ivmekopyBVEsKTndtJOQI/edit?gid=1537900891#gid=1537900891")
@@ -209,16 +211,18 @@ ggplotly(p3) %>%
 
 ## Fila 4 - Gráficas Adicionales {height=""}
 
-```{r}
-#| label: tabla-top
+::: {.panel-tabset}
 
+### Vistas por día
+```{r}
+#| label: tabla-top-vistas-dias
 zenododata %>%
   select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
   arrange(desc(vistas_dias)) %>%
   head(10) %>%
   gt() %>%
   tab_header(
-    title = "Top 10 Publicaciones por Vistas"
+    title = "Top 10 Publicaciones por Vistas por Día"
   ) %>%
   fmt_number(
     columns = c(vistas, descargas),
@@ -248,5 +252,129 @@ zenododata %>%
     locations = cells_body()
   ) %>%
   opt_row_striping()
-
 ```
+
+### Descargas por día
+```{r}
+#| label: tabla-top-descargas-dias
+zenododata %>%
+  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  arrange(desc(descargas_dias)) %>%
+  head(10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top 10 Publicaciones por Descargas por Día"
+  ) %>%
+  fmt_number(
+    columns = c(vistas, descargas),
+    decimals = 0,
+    use_seps = TRUE
+  ) %>%
+  fmt_number(
+    columns = c(vistas_dias, descargas_dias),
+    decimals = 2
+  ) %>%
+  cols_label(
+    titulo = "Título",
+    tipo = "Tipo",
+    vistas = "Vistas",
+    descargas = "Descargas",
+    vistas_dias = "Vistas/Día",
+    descargas_dias = "Descargas/Día"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all",
+        color = "grey",
+        weight = px(1)
+      )
+    ),
+    locations = cells_body()
+  ) %>%
+  opt_row_striping()
+```
+
+### Total de vistas
+```{r}
+#| label: tabla-top-vistas-total
+zenododata %>%
+  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  arrange(desc(vistas)) %>%
+  head(10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top 10 Publicaciones por Total de Vistas"
+  ) %>%
+  fmt_number(
+    columns = c(vistas, descargas),
+    decimals = 0,
+    use_seps = TRUE
+  ) %>%
+  fmt_number(
+    columns = c(vistas_dias, descargas_dias),
+    decimals = 2
+  ) %>%
+  cols_label(
+    titulo = "Título",
+    tipo = "Tipo",
+    vistas = "Vistas",
+    descargas = "Descargas",
+    vistas_dias = "Vistas/Día",
+    descargas_dias = "Descargas/Día"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all",
+        color = "grey",
+        weight = px(1)
+      )
+    ),
+    locations = cells_body()
+  ) %>%
+  opt_row_striping()
+```
+
+### Total de descargas
+```{r}
+#| label: tabla-top-descargas-total
+zenododata %>%
+  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  arrange(desc(descargas)) %>%
+  head(10) %>%
+  gt() %>%
+  tab_header(
+    title = "Top 10 Publicaciones por Total de Descargas"
+  ) %>%
+  fmt_number(
+    columns = c(vistas, descargas),
+    decimals = 0,
+    use_seps = TRUE
+  ) %>%
+  fmt_number(
+    columns = c(vistas_dias, descargas_dias),
+    decimals = 2
+  ) %>%
+  cols_label(
+    titulo = "Título",
+    tipo = "Tipo",
+    vistas = "Vistas",
+    descargas = "Descargas",
+    vistas_dias = "Vistas/Día",
+    descargas_dias = "Descargas/Día"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = "all",
+        color = "grey",
+        weight = px(1)
+      )
+    ),
+    locations = cells_body()
+  ) %>%
+  opt_row_striping()
+```
+
+:::
