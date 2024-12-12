@@ -35,7 +35,7 @@ library(plotly)
 #| message: false
 
 
-gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+##gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 
 mailchimp <- read_sheet("1grpIQWXQfVT82vS-mU2JjkKzZ0zwrGes3CFEnWdjYf8")[c(1,4:7, 13:19)]
 

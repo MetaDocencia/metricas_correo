@@ -1,15 +1,18 @@
 ---
-title: |
-  Dashboard de Publicaciones en Zenodo <a href="https://metadocencia.github.io/reporte-mailchimp/" class="btn btn-primary btn-sm" style="margin-left: 10px;"><i class="bi bi-link-45deg"></i> Volver al principio</a>
+title: Dashboard de Publicaciones en Zenodo
 format: 
   dashboard:
     orientation: rows
+    nav-buttons: 
+      - icon: images/md-logo.png
+        href: "https://metadocencia.github.io/reporte-mailchimp/"
     theme:
       - flatly
       - custom.scss
     nav: sticky
 embed-resources: true
 logo: images/md-logo.png
+logo-href: "https://metadocencia.github.io/reporte-mailchimp/"
 include-in-header:
   - text: |
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -31,19 +34,18 @@ library(bsicons)
 ```
 
 ```{r}
-gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
+##gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 # Cargar datos
 zenododata <- read_sheet("https://docs.google.com/spreadsheets/d/1vJ5BffSEJia0HS36zUJU90ivmekopyBVEsKTndtJOQI/edit?gid=1537900891#gid=1537900891")
 ```
-
 
 ```{r}
 #| label: metricas-totales
 # Calcular métricas
 total_vistas <- sum(zenododata$vistas, na.rm = TRUE)
 total_descargas <- sum(zenododata$descargas, na.rm = TRUE)
-promedio_vistas <- mean(zenododata$vistas_dias, na.rm = TRUE)
-promedio_descargas <- mean(zenododata$descargas_dias, na.rm = TRUE)
+promedio_vistas <- mean(zenododata$vistas_mes, na.rm = TRUE)
+promedio_descargas <- mean(zenododata$descargas_mes, na.rm = TRUE)
 ```
 
 ## Métricas Generales {height=""}
@@ -51,7 +53,7 @@ promedio_descargas <- mean(zenododata$descargas_dias, na.rm = TRUE)
 ```{r}
 # Crear value boxes
 value_box(
-  title = "Total de Vistas",
+  title = "Total de vistas",
   value = scales::number(total_vistas, big.mark = ","),
   showcase = bsicons::bs_icon("eye"),
   theme = "primary",
@@ -59,10 +61,9 @@ value_box(
 )
 ```
 
-
 ```{r}
 value_box(
-  title = "Total de Descargas",
+  title = "Total de descargas",
   value = scales::number(total_descargas, big.mark = ","),
   showcase = bsicons::bs_icon("download"),
   theme = "info",
@@ -70,10 +71,9 @@ value_box(
 )
 ```
 
-
 ```{r}
 value_box(
-  title = "Promedio Diario de Vistas",
+  title = "Promedio mensual de vistas",
   value = scales::number(promedio_vistas, accuracy = 0.01),
   showcase = bsicons::bs_icon("graph-up"),
   theme = "success",
@@ -81,10 +81,9 @@ value_box(
 )
 ```
 
-
 ```{r}
 value_box(
-  title = "Promedio Diario de Descargas",
+  title = "Promedio mensual de descargas",
   value = scales::number(promedio_descargas, accuracy = 0.01),
   showcase = bsicons::bs_icon("graph-up-arrow"),
   theme = "warning",
@@ -92,17 +91,23 @@ value_box(
 )
 ```
 
-
 ##  {height=""}
 
 ### Vistas y descargas {width="50%"}
 ```{r}
+#| title: Vistas y descargas por tipo de publicación
 #| label: grafico-tipo
 #| fig-width: 12
 #| fig-height: 6
 
 # Gráfico 1: Vistas y Descargas por Tipo
 p1 <- zenododata %>%
+  mutate(tipo = fct_recode(tipo,
+                              "otros" = "other",
+                              "otras publicaciones" = "publication-other",
+                              "articulos" = "publication-article", 
+                              "propuestas" = "publication-proposal",
+                              "reportes" = "publication-report")) %>%
   pivot_longer(cols = c(vistas, descargas),
                names_to = "metrica",
                values_to = "valor") %>%
@@ -118,7 +123,6 @@ p1 <- zenododata %>%
     legend.position = "top"
   ) +
   labs(
-    title = "Vistas y Descargas por Tipo de Publicación",
     x = "Tipo de Publicación",
     y = "Cantidad",
     fill = "Métrica"
@@ -126,13 +130,12 @@ p1 <- zenododata %>%
 
 ggplotly(p1) %>%
   config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
-
 ```
-
 
 ### Historico {width="50%"}
 
 ```{r}
+#| title: Progresión histórica de vistas y descargas
 #| label: grafico-historico
 #| fig-width: 12
 #| fig-height: 6
@@ -155,7 +158,6 @@ p2 <- zenododata %>%
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
   labs(
-    title = "Progresión Histórica de Vistas y Descargas",
     x = "Fecha de Publicación",
     y = "Cantidad",
     color = "Métrica"
@@ -163,33 +165,40 @@ p2 <- zenododata %>%
 
 ggplotly(p2) %>%
   config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
-
 ```
-
 
 ## Fila 3 - Gráficas Adicionales {height=""}
 
 ### Promedios {width=""}
 ```{r}
+#| title: Promedio de Vistas y Descargas por Publicación
 #| label: grafico-promedios
 #| fig-width: 12
 #| fig-height: 6
 
 # Gráfico 3: Promedio de Vistas y Descargas por Publicación
 p3 <- zenododata %>%
-  select(titulo, vistas_dias, descargas_dias) %>%
-  pivot_longer(cols = c(vistas_dias, descargas_dias),
-               names_to = "metrica",
-               values_to = "valor") %>%
-  arrange(desc(valor)) %>%
-  head(15) %>% # Top 15 para mejor visualización
-  mutate(titulo = substr(titulo, 1, 50)) %>% # Acortar títulos largos
-  ggplot(aes(x = reorder(titulo, valor), y = valor, fill = metrica)) +
+  select(titulo, vistas_mes, descargas_mes) %>%
+  mutate(
+    titulo = fct_reorder(titulo, vistas_mes, .desc = TRUE) # Ordenar por vistas_mes
+  ) %>%
+  top_n(10, vistas_mes) %>% # Seleccionar las 10 publicaciones con más vistas
+  pivot_longer(
+    cols = c(vistas_mes, descargas_mes),
+    names_to = "metrica",
+    values_to = "valor"
+  )
+# Extraer el orden de los títulos después del reordenamiento
+ordered_titles <- levels(p3$titulo)
+# Crear el gráfico respetando el orden
+p3_plot <- ggplot(p3, aes(x = titulo, y = valor, fill = metrica)) +
   geom_col(position = "dodge") +
   coord_flip() +
-  scale_fill_manual(values = c("vistas_dias" = "#004F70", 
-                              "descargas_dias" = "#C83737"),
-                    labels = c("Vistas por día", "Descargas por día")) +
+  scale_x_discrete(limits = ordered_titles) + # Usar el orden específico
+  scale_fill_manual(
+    values = c("vistas_mes" = "#004F70", "descargas_mes" = "#C83737"),
+    labels = c("Vistas por mes", "Descargas por mes")
+  ) +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
@@ -197,32 +206,29 @@ p3 <- zenododata %>%
     axis.text.y = element_text(size = 8)
   ) +
   labs(
-    title = "Promedio de Vistas y Descargas por Publicación",
     x = "Título de la Publicación",
-    y = "Promedio Diario",
+    y = "Promedio Mensual",
     fill = "Métrica"
   )
-
-ggplotly(p3) %>%
-    config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
+ggplotly(p3_plot) %>%
+  config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 
 ```
-
 
 ## Fila 4 - Gráficas Adicionales {height=""}
 
 ::: {.panel-tabset}
 
-### Vistas por día
+### Vistas por mes
 ```{r}
-#| label: tabla-top-vistas-dias
+#| label: tabla-top-vistas-mes
 zenododata %>%
-  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
-  arrange(desc(vistas_dias)) %>%
+  select(titulo, tipo, vistas, descargas, vistas_mes, descargas_mes) %>%
+  arrange(desc(vistas_mes)) %>%
   head(10) %>%
   gt() %>%
   tab_header(
-    title = "Top 10 Publicaciones por Vistas por Día"
+    title = "Top 10 Publicaciones por Vistas por mes"
   ) %>%
   fmt_number(
     columns = c(vistas, descargas),
@@ -230,7 +236,7 @@ zenododata %>%
     use_seps = TRUE
   ) %>%
   fmt_number(
-    columns = c(vistas_dias, descargas_dias),
+    columns = c(vistas_mes, descargas_mes),
     decimals = 2
   ) %>%
   cols_label(
@@ -238,8 +244,8 @@ zenododata %>%
     tipo = "Tipo",
     vistas = "Vistas",
     descargas = "Descargas",
-    vistas_dias = "Vistas/Día",
-    descargas_dias = "Descargas/Día"
+    vistas_mes = "Vistas/mes",
+    descargas_mes = "Descargas/mes"
   ) %>%
   tab_style(
     style = list(
@@ -254,16 +260,16 @@ zenododata %>%
   opt_row_striping()
 ```
 
-### Descargas por día
+### Descargas por mes
 ```{r}
-#| label: tabla-top-descargas-dias
+#| label: tabla-top-descargas-mes
 zenododata %>%
-  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
-  arrange(desc(descargas_dias)) %>%
+  select(titulo, tipo, vistas, descargas, vistas_mes, descargas_mes) %>%
+  arrange(desc(descargas_mes)) %>%
   head(10) %>%
   gt() %>%
   tab_header(
-    title = "Top 10 Publicaciones por Descargas por Día"
+    title = "Top 10 Publicaciones por Descargas por mes"
   ) %>%
   fmt_number(
     columns = c(vistas, descargas),
@@ -271,7 +277,7 @@ zenododata %>%
     use_seps = TRUE
   ) %>%
   fmt_number(
-    columns = c(vistas_dias, descargas_dias),
+    columns = c(vistas_mes, descargas_mes),
     decimals = 2
   ) %>%
   cols_label(
@@ -279,8 +285,8 @@ zenododata %>%
     tipo = "Tipo",
     vistas = "Vistas",
     descargas = "Descargas",
-    vistas_dias = "Vistas/Día",
-    descargas_dias = "Descargas/Día"
+    vistas_mes = "Vistas/mes",
+    descargas_mes = "Descargas/mes"
   ) %>%
   tab_style(
     style = list(
@@ -299,7 +305,7 @@ zenododata %>%
 ```{r}
 #| label: tabla-top-vistas-total
 zenododata %>%
-  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  select(titulo, tipo, vistas, descargas, vistas_mes, descargas_mes) %>%
   arrange(desc(vistas)) %>%
   head(10) %>%
   gt() %>%
@@ -312,7 +318,7 @@ zenododata %>%
     use_seps = TRUE
   ) %>%
   fmt_number(
-    columns = c(vistas_dias, descargas_dias),
+    columns = c(vistas_mes, descargas_mes),
     decimals = 2
   ) %>%
   cols_label(
@@ -320,8 +326,8 @@ zenododata %>%
     tipo = "Tipo",
     vistas = "Vistas",
     descargas = "Descargas",
-    vistas_dias = "Vistas/Día",
-    descargas_dias = "Descargas/Día"
+    vistas_mes = "Vistas/mes",
+    descargas_mes = "Descargas/mes"
   ) %>%
   tab_style(
     style = list(
@@ -340,7 +346,7 @@ zenododata %>%
 ```{r}
 #| label: tabla-top-descargas-total
 zenododata %>%
-  select(titulo, tipo, vistas, descargas, vistas_dias, descargas_dias) %>%
+  select(titulo, tipo, vistas, descargas, vistas_mes, descargas_mes) %>%
   arrange(desc(descargas)) %>%
   head(10) %>%
   gt() %>%
@@ -353,7 +359,7 @@ zenododata %>%
     use_seps = TRUE
   ) %>%
   fmt_number(
-    columns = c(vistas_dias, descargas_dias),
+    columns = c(vistas_mes, descargas_mes),
     decimals = 2
   ) %>%
   cols_label(
@@ -361,8 +367,8 @@ zenododata %>%
     tipo = "Tipo",
     vistas = "Vistas",
     descargas = "Descargas",
-    vistas_dias = "Vistas/Día",
-    descargas_dias = "Descargas/Día"
+    vistas_mes = "Vistas/mes",
+    descargas_mes = "Descargas/mes"
   ) %>%
   tab_style(
     style = list(
