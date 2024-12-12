@@ -37,6 +37,15 @@ library(bsicons)
 ##gs4_auth(path = Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 # Cargar datos
 zenododata <- read_sheet("https://docs.google.com/spreadsheets/d/1vJ5BffSEJia0HS36zUJU90ivmekopyBVEsKTndtJOQI/edit?gid=1537900891#gid=1537900891")
+
+zenododata <- zenododata %>%
+  mutate(tipo = fct_recode(tipo,
+                              "otros" = "other",
+                              "otras publicaciones" = "publication-other",
+                              "articulos" = "publication-article", 
+                              "propuestas" = "publication-proposal",
+                              "reportes" = "publication-report")) 
+
 ```
 
 ```{r}
@@ -102,12 +111,6 @@ value_box(
 
 # Gráfico 1: Vistas y Descargas por Tipo
 p1 <- zenododata %>%
-  mutate(tipo = fct_recode(tipo,
-                              "otros" = "other",
-                              "otras publicaciones" = "publication-other",
-                              "articulos" = "publication-article", 
-                              "propuestas" = "publication-proposal",
-                              "reportes" = "publication-report")) %>%
   pivot_longer(cols = c(vistas, descargas),
                names_to = "metrica",
                values_to = "valor") %>%
