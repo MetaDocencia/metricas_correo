@@ -179,25 +179,27 @@ ggplotly(p2) %>%
 # Gráfico 3: Promedio de Vistas y Descargas por Publicación
 p3 <- zenododata %>%
   select(titulo, vistas_mes, descargas_mes) %>%
+  top_n(10, vistas_mes) %>% 
   mutate(
-    titulo = fct_reorder(titulo, vistas_mes, .desc = TRUE) # Ordenar por vistas_mes
+    titulo = fct_reorder(titulo, vistas_mes) # Ordenar por vistas_mes
   ) %>%
-  top_n(10, vistas_mes) %>% # Seleccionar las 10 publicaciones con más vistas
   pivot_longer(
     cols = c(vistas_mes, descargas_mes),
     names_to = "metrica",
     values_to = "valor"
-  )
+  ) %>%
+  mutate(metrica = recode(metrica, "vistas_mes" = "Vistas por mes",
+                          "descargas_mes" = "Descargas por mes"))
 # Extraer el orden de los títulos después del reordenamiento
 ordered_titles <- levels(p3$titulo)
+
 # Crear el gráfico respetando el orden
 p3_plot <- ggplot(p3, aes(x = titulo, y = valor, fill = metrica)) +
   geom_col(position = "dodge") +
   coord_flip() +
   scale_x_discrete(limits = ordered_titles) + # Usar el orden específico
   scale_fill_manual(
-    values = c("vistas_mes" = "#004F70", "descargas_mes" = "#C83737"),
-    labels = c("Vistas por mes", "Descargas por mes")
+    values = c("Vistas por mes" = "#004F70", "Descargas por mes" = "#C83737")
   ) +
   theme_minimal() +
   theme(
