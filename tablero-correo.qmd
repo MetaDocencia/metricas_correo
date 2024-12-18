@@ -95,55 +95,65 @@ value_box(
   theme = "primary",
   full_width = TRUE,
 )
+
 ```
 
 
 ```{r}
-#| content: valuebox
-#| title: "Desuscripciones"
 
-list(
-  icon = "person-fill-dash",
-  color = "#C83737",
-  value = ultimo_envio$desuscriptores
+value_box(
+  title = "Desuscripciones",
+  value = scales::number(ultimo_envio$desuscriptores, big.mark = ","),
+  showcase = bsicons::bs_icon("person-fill-dash"),
+  theme = "info",
+  full_width = TRUE,
 )
 ```
+
 
 ```{r}
-#| content: valuebox
-#| title: "Aperturas únicas"
-
-list(
-  icon = "envelope-paper",
-  color = "#EEEEEE",
-  value = ultimo_envio$aperturas_unicas
+value_box(
+  title = "Aperturas unicas",
+  value = scales::number(ultimo_envio$aperturas_unicas, big.mark = ","),
+  showcase = bsicons::bs_icon("envelope-paper"),
+  theme = "success",
+  full_width = TRUE,
 )
+
+
 ```
+
 
 ```{r}
-#| content: valuebox
-#| title: "Tasa de apertura"
 
-list(
-  icon = "envelope-paper-fill",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$aperturas_tasa)
+value_box(
+  title = "Tasa de apertura",
+  value = scales::number(ultimo_envio$aperturas_tasa, big.mark = ","),
+  showcase = bsicons::bs_icon("envelope-paper-fill"),
+  theme = "warning",
+  full_width = TRUE,
 )
+
+
+
+
 ```
+
 
 ```{r}
-#| content: valuebox
-#| title: "Tasa de clicks"
-
-list(
-  icon = "cursor",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$clics_tasa)
+value_box(
+  title = "Tasa de clicks",
+  value = scales::number(ultimo_envio$clics_tasa, big.mark = ","),
+  showcase = bsicons::bs_icon("cursor"),
+  theme = "info",
+  full_width = TRUE,
 )
+
+
 ```
 
 
-## Fila 2 {height="40%"}
+## Fila 2 {height=""}
 
 ### Columna - Métricas por newsletter{width="60%"}
 
@@ -194,7 +204,7 @@ p2 <- apuntes |>
 ggplotly(p2) %>%
   config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
-## Fila 3 {height="40%"}
+## Fila 3 {height=""}
 
 ### Columna - Tasa de apertura por newsletter {width="50%"}
 
@@ -266,14 +276,16 @@ ultimo_envio <- alta |>
 
 
 ```{r}
-#| content: valuebox
-#| title: "Destinatarios totales"
 
-list(
-  icon = "people-fill",
-  color = "#43AC6A",
-  value = ultimo_envio$total_destinatarios
+value_box(
+  title = "Destinatarios totales",
+  value = scales::number(ultimo_envio$total_destinatarios, big.mark = ","),
+  showcase = bsicons::bs_icon("people-fill"),
+  theme = "primary",
+  full_width = TRUE,
 )
+
+
 ```
 
 
@@ -281,49 +293,49 @@ list(
 
 value_box(
   title = "Desuscripciones",
-  value = scales::number(, big.mark =ultimo_envio$desuscriptores ","),
+  value = scales::number(ultimo_envio$desuscriptores, big.mark = ","),
   showcase = bsicons::bs_icon("person-fill-dash"),
-  theme = "primary",
+  theme = "info",
   full_width = TRUE,
 )
 
 ```
 
 ```{r}
-#| content: valuebox
-#| title: "Aperturas únicas"
-
-list(
-  icon = "envelope-paper",
-  color = "#EEEEEE",
-  value = ultimo_envio$aperturas_unicas
+value_box(
+  title = "Aperturas unicas",
+  value = scales::number(ultimo_envio$aperturas_unicas, big.mark = ","),
+  showcase = bsicons::bs_icon("envelope-paper"),
+  theme = "success",
+  full_width = TRUE,
 )
+
 ```
 
 ```{r}
-#| content: valuebox
-#| title: "Tasa de apertura"
-
-list(
-  icon = "envelope-paper-fill",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$aperturas_tasa)
+value_box(
+  title = "Tasa de apertura",
+  value = scales::number(ultimo_envio$aperturas_tasa, big.mark = ","),
+  showcase = bsicons::bs_icon("envelope-paper-fill"),
+  theme = "info",
+  full_width = TRUE,
 )
+
 ```
 
 ```{r}
-#| content: valuebox
-#| title: "Tasa de clicks"
-
-list(
-  icon = "cursor",
-  color = "#EEEEEE",
-  value = label_percent(accuracy = 0.1)(ultimo_envio$clics_tasa)
+value_box(
+  title = "Tasa de clicks",
+  value = scales::number(ultimo_envio$clics_tasa, big.mark = ","),
+  showcase = bsicons::bs_icon("cursor"),
+  theme = "warning",
+  full_width = TRUE,
 )
+
 ```
 
 
-## Fila 2 {height="40%"}
+## Fila 2 {height=""}
 
 ### Columna - Métricas por envío{width="60%"}
 
@@ -369,7 +381,7 @@ p6 <- alta |>
 ggplotly(p6) %>%
   config(displayModeBar = FALSE, showLink = FALSE, displaylogo = FALSE)
 ```
-## Fila 3 {height="40%"}
+## Fila 3 {height="35%"}
 
 ### Columna - Tasa de apertura por envío{width="50%"}
 
