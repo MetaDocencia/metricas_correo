@@ -158,7 +158,7 @@ value_box(
 ### Columna - Métricas por newsletter{width="60%"}
 
 ```{r}
-#| title: Métricas por Newsletter
+#| title: Métricas por newsletter
 #| fig-width: 8
 #| fig-height: 2
 
@@ -209,7 +209,7 @@ ggplotly(p2) %>%
 ### Columna - Tasa de apertura por newsletter {width="50%"}
 
 ```{r}
-#| title: Tasa de apertura por Newsletter
+#| title: Tasa de apertura por newsletter
 #| fig-width: 6
 #| fig-height: 2
 
@@ -230,7 +230,7 @@ ggplotly(p3) %>%
 ### Columna - Desuscriptores por newsletters {width="50%"}
 
 ```{r}
-#| title: Desuscriptores por Newsletter
+#| title: Desuscriptores por newsletter
 #| fig-width: 6
 #| fig-height: 2
 
@@ -340,7 +340,7 @@ value_box(
 ### Columna - Métricas por envío{width="60%"}
 
 ```{r}
-#| title: Métricas por Newsletter
+#| title: Métricas por newsletter
 #| fig-width: 8
 #| fig-height: 2
 
@@ -386,7 +386,7 @@ ggplotly(p6) %>%
 ### Columna - Tasa de apertura por envío{width="50%"}
 
 ```{r}
-#| title: Tasa de apertura por Newsletter
+#| title: Tasa de apertura por newsletter
 #| fig-width: 6
 #| fig-height: 2
 
@@ -403,7 +403,7 @@ ggplotly(p7) %>%
 ### Columna - Desuscriptores por envío {width="50%"}
 
 ```{r}
-#| title: Desuscriptores por Newsletter
+#| title: Desuscriptores por newsletter
 #| fig-width: 6
 #| fig-height: 2
 
