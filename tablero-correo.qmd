@@ -278,14 +278,15 @@ list(
 
 
 ```{r}
-#| content: valuebox
-#| title: "Desuscripciones"
 
-list(
-  icon = "person-fill-dash",
-  color = "#C83737",
-  value = ultimo_envio$desuscriptores
+value_box(
+  title = "Desuscripciones",
+  value = scales::number(, big.mark =ultimo_envio$desuscriptores ","),
+  showcase = bsicons::bs_icon("person-fill-dash"),
+  theme = "primary",
+  full_width = TRUE,
 )
+
 ```
 
 ```{r}

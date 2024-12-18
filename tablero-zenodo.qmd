@@ -174,7 +174,7 @@ ggplotly(p2) %>%
 
 ### Promedios {width=""}
 ```{r}
-#| title: Promedio de Vistas y Descargas por Publicación
+#| title: Promedio de vistas y descargas por publicación
 #| label: grafico-promedios
 #| fig-width: 12
 #| fig-height: 6
